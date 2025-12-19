@@ -28,6 +28,7 @@ body.dark-mode {
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+/* En móvil permitimos cursor auto para mejor tacto */
 @media (hover: none) { * { cursor: auto !important; } }
 
 body {
@@ -91,12 +92,7 @@ body.clicking .cursor-outline { width: 25px; height: 25px; background-color: var
 .logo-img { height: 40px; width: auto; display: block; transition: filter 0.3s ease; mix-blend-mode: multiply; }
 body.dark-mode .logo-img { filter: invert(1); mix-blend-mode: screen; }
 .menu { display: flex; gap: 10px; align-items: center; background: rgba(125,125,125,0.1); padding: 5px; border-radius: 50px; }
-.menu a { 
-    text-decoration: none; color: var(--text-secondary); 
-    font-size: 0.95rem; font-weight: 600; padding: 10px 20px; 
-    border-radius: 30px; transition: all 0.3s; 
-    display: inline-block; 
-}
+.menu a { text-decoration: none; color: var(--text-secondary); font-size: 0.95rem; font-weight: 600; padding: 10px 20px; border-radius: 30px; transition: all 0.3s; display: inline-block; }
 .menu a:hover { background-color: rgba(125,125,125,0.1); color: var(--text-main); transform: scale(1.05); }
 .menu a.active { background-color: var(--text-main); color: var(--bg-color); box-shadow: 0 4px 15px rgba(0,0,0,0.2); transform: scale(1); }
 .theme-floating-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; border-radius: 50%; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); box-shadow: 0 10px 20px rgba(0,0,0,0.15); font-size: 1.5rem; z-index: 2000; display: flex; justify-content: center; align-items: center; transition: all 0.3s; }
@@ -140,37 +136,27 @@ body.dark-mode .timeline-container::before { background: #333; }
     transition: height 0.1s linear;
 }
 
-/* --- TARJETA CLÁSICA Y LIMPIA (HOLOGRAFICA 2D) --- */
+/* --- TARJETA --- */
 .card {
     background: var(--card-bg); width: 100%; max-width: 700px; padding: 60px;
     border-radius: 24px; box-shadow: var(--shadow-card); 
     border: 1px solid var(--border-color); text-align: center; position: relative; z-index: 10;
-    margin-top: 40px; overflow: hidden; /* Para contener el brillo */
-    
+    margin-top: 40px; overflow: hidden;
     opacity: 0; 
-    /* Transición simple */
     transition: transform 0.1s ease-out, box-shadow 0.3s ease, opacity 1s ease, filter 1s ease;
     filter: blur(10px);
 }
 .card.visible { opacity: 1; filter: blur(0); }
 
-/* AL PASAR EL RATÓN (HOVER) - Sube */
-.card:hover {
-    transform: translateY(-8px) scale(1.01);
-    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
-}
-
-/* BRILLO HOLOGRÁFICO QUE SIGUE AL RATÓN */
+/* BRILLO HOLOGRÁFICO */
 .card::after {
     content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(212, 175, 55, 0.15), transparent 50%);
-    pointer-events: none; opacity: 0; transition: opacity 0.5s ease;
-    z-index: 5;
+    pointer-events: none; opacity: 0; transition: opacity 0.5s ease; z-index: 5;
 }
 .card:hover::after { opacity: 1; }
 
 .card-year { font-size: 1.1rem; font-weight: 700; color: var(--accent); margin-bottom: 20px; display: inline-block; border-bottom: 2px solid var(--accent); padding-bottom: 5px; opacity: 0; transition: opacity 0.8s ease; }
-/* H2 tiene min-height para evitar saltos con el efecto matrix */
 .card h2 { font-size: 3rem; margin-bottom: 20px; line-height: 1; letter-spacing: -1px; color: var(--text-main); opacity: 0; transition: opacity 0.8s ease; min-height: 3rem; }
 .card p { color: var(--text-secondary); font-size: 1.2rem; line-height: 1.6; opacity: 0; transition: opacity 0.8s ease; }
 .card img { width: 100%; height: 350px; object-fit: cover; border-radius: 12px; margin-top: 40px; opacity: 0.9; box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
@@ -184,7 +170,7 @@ body.dark-mode .timeline-container::before { background: #333; }
     opacity: 0.4; filter: blur(2px) grayscale(0.8); transform: scale(0.98); transition: all 0.6s ease;
 }
 
-/* --- MODAL (GLASSMORPHISM) --- */
+/* --- MODAL --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px); z-index: 2000; opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; padding: 20px; }
 .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 .modal-content-box { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; overscroll-behavior: contain; border-radius: 20px; padding: 50px; position: relative; box-shadow: 0 50px 100px rgba(0,0,0,0.5); transform: translateY(30px); transition: all 0.3s; text-align: left; border: 1px solid var(--border-color); }
@@ -206,12 +192,67 @@ footer { text-align: center; padding: 80px 20px; color: var(--text-secondary); b
 }
 @keyframes rippleAnim { to { transform: scale(3); opacity: 0; } }
 
+/* ========================================= */
+/* --- RESPONSIVE MOBILE (CORREGIDO) --- */
+/* ========================================= */
 @media screen and (max-width: 768px) {
+    /* Ocultar cursores custom */
     .cursor-dot, .cursor-outline { display: none !important; }
-    .navbar { width: 95%; max-width: none; top: 10px; height: 60px; }
-    .nav-content { padding: 0 20px; }
-    .logo-img { height: 35px; } 
-    .home-content h1 { font-size: 3rem; }
-    .theme-floating-btn { bottom: 20px; right: 20px; width: 45px; height: 45px; }
-    #search-input { width: 90%; }
+    
+    /* Navbar ajustada */
+    .navbar { width: 92%; top: 15px; height: 60px; border-radius: 15px; }
+    .nav-content { padding: 0 15px; }
+    .logo-img { height: 30px; }
+    .menu a { padding: 8px 12px; font-size: 0.85rem; }
+
+    /* Home Texto */
+    .home-content h1 { font-size: 3rem; letter-spacing: -1px; }
+    .cta-button { padding: 15px 40px; font-size: 1rem; }
+
+    /* Timeline Hero */
+    .hero { padding: 120px 20px 20px; }
+    .hero h1 { font-size: 2.5rem; }
+    #search-input { width: 100%; font-size: 0.95rem; padding: 12px 20px; }
+
+    /* Tarjetas AIREADAS */
+    .timeline-container { 
+        padding: 0 20px 120px; /* Más padding abajo y a los lados */
+    }
+    .card { 
+        padding: 40px 25px; /* Más espacio interno arriba/abajo */
+        margin-top: 50px; /* Más espacio entre tarjetas */
+        border-radius: 20px;
+    }
+    .card h2 { 
+        font-size: 2.2rem; 
+        min-height: auto; 
+        margin-bottom: 20px; /* Separar título del año */
+        line-height: 1.2;
+    }
+    .card p { 
+        font-size: 1.1rem; 
+        line-height: 1.8; /* MÁS AIRE EN EL TEXTO */
+        margin-bottom: 20px;
+    }
+    .card img { 
+        height: 220px; 
+        margin-top: 30px; /* Separar imagen del texto */
+    }
+    .card-year {
+        margin-bottom: 20px; /* Separar año del título */
+    }
+    
+    /* Desactivar efectos que molestan en móvil */
+    .timeline-container:hover .card:not(:hover) { opacity: 1; filter: none; transform: none; }
+    .card:hover { transform: none; box-shadow: var(--shadow-card); }
+    .card::after { display: none; } 
+    
+    /* Botón flotante tema */
+    .theme-floating-btn { bottom: 20px; right: 20px; width: 45px; height: 45px; font-size: 1.2rem; }
+
+    /* Modal ajuste móvil */
+    .modal-content-box { padding: 30px 20px; max-height: 85vh; border-radius: 20px 20px 0 0; transform: translateY(100px); }
+    .modal-overlay { align-items: flex-end; padding: 0; }
+    .modal-overlay.active .modal-content-box { transform: translateY(0); }
+    .modal-close-btn { top: 15px; right: 15px; }
 }

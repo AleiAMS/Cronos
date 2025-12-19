@@ -1,4 +1,4 @@
-/* --- DATOS: HISTORIA UNIVERSAL --- */
+/* --- 1. BASE DE DATOS DE HISTORIA --- */
 const eventos = [
     {
         year: "27 a.C. - 476 d.C.",
@@ -54,31 +54,39 @@ const eventos = [
     }
 ];
 
+// Esperar a que cargue todo el HTML
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 0. PRELOADER Y TEMA PERSISTENTE
+    /* --- 2. GESTIÓN DEL TEMA (PERSISTENTE) --- */
     const btnTheme = document.getElementById('btn-theme-toggle');
-    
-    // --- RECUPERAR TEMA GUARDADO ---
+    // Recuperar tema guardado
     const savedTheme = localStorage.getItem('cronos-theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');
         if(btnTheme) btnTheme.textContent = '☀️';
     }
 
+    if (btnTheme) {
+        btnTheme.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            btnTheme.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('cronos-theme', isDark ? 'dark' : 'light');
+        });
+    }
+
+    /* --- 3. PRELOADER Y TÍTULO MATRIX --- */
     const removePreloader = () => {
         document.body.classList.add('loaded');
         document.body.classList.remove('loading');
     };
-    setTimeout(removePreloader, 1500);
-    setTimeout(removePreloader, 3000); 
+    setTimeout(removePreloader, 1000); // 1 segundo de carga mínima
 
-    // Efecto Matrix en el Título Principal
+    // Efecto Matrix en Título Principal
     const textElement = document.querySelector(".gradient-text");
-    const originalText = textElement ? textElement.innerText : "Reimaginada.";
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&";
-    
     if(textElement) {
+        const originalText = textElement.innerText;
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&";
         let iteration = 0;
         let interval = setInterval(() => {
             textElement.innerText = originalText.split("").map((letter, index) => {
@@ -90,31 +98,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 30);
     }
 
-    let docTitle = document.title;
-    window.addEventListener("blur", () => { document.title = "⏳ El tiempo corre..."; });
-    window.addEventListener("focus", () => { document.title = docTitle; });
+    /* --- 4. SCROLL SUAVE (LENIS) --- */
+    // Verificamos si Lenis está cargado para evitar errores
+    let lenis;
+    if (typeof Lenis !== 'undefined') {
+        lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smooth: true });
+        function raf(time) { 
+            lenis.raf(time); 
+            requestAnimationFrame(raf); 
+        }
+        requestAnimationFrame(raf);
+    }
 
-    // 1. SCROLL SUAVE (LENIS)
-    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smooth: true });
-    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-    requestAnimationFrame(raf);
-
-    // 2. PARTICULAS (CONEXIONES Y WARP SPEED)
+    /* --- 5. SISTEMA DE PARTÍCULAS COMPLETO --- */
     const canvas = document.getElementById('particles-canvas');
     if (canvas) {
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        
         let particlesArray = [];
         const numberOfParticles = 80;
+        const isMobile = window.innerWidth <= 768;
         
-        let particleMouse = { x: null, y: null, radius: 120 };
+        // Ratón para partículas
+        let particleMouse = { x: null, y: null, radius: 150 };
+        
         window.addEventListener('mousemove', (e) => {
             particleMouse.x = e.x;
             particleMouse.y = e.y;
         });
 
-        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initParticles(); });
+        window.addEventListener('resize', () => { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+            initParticles(); 
+        });
         
         class Particle {
             constructor() { 
@@ -125,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.speedY = (Math.random() * 0.5) - 0.25; 
             }
             update() { 
-                // WARP SPEED
+                // Efecto Warp Speed al hacer scroll
                 let warpSpeed = 0;
                 if (lenis && lenis.velocity) {
                     warpSpeed = lenis.velocity * 0.5;
@@ -134,41 +153,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.x += this.speedX;
                 this.y += this.speedY + warpSpeed;
                 
+                // Reposicionar si salen de pantalla
                 if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
                 if (this.y > canvas.height) this.y = 0;
                 if (this.y < 0) this.y = canvas.height;
 
-                // CONEXIONES AL RATÓN
-                let dx = particleMouse.x - this.x;
-                let dy = particleMouse.y - this.y;
-                let distance = Math.sqrt(dx*dx + dy*dy);
-                if (distance < particleMouse.radius) {
-                    ctx.beginPath();
-                    const isDark = document.body.classList.contains('dark-mode'); 
-                    ctx.strokeStyle = isDark ? `rgba(255,255,255, ${1 - distance/particleMouse.radius})` : `rgba(212,175,55, ${1 - distance/particleMouse.radius})`;
-                    ctx.lineWidth = 1;
-                    ctx.moveTo(this.x, this.y);
-                    ctx.lineTo(particleMouse.x, particleMouse.y);
-                    ctx.stroke();
+                // Conexiones neuronales (SOLO EN PC)
+                if (!isMobile && particleMouse.x != null) {
+                    let dx = particleMouse.x - this.x;
+                    let dy = particleMouse.y - this.y;
+                    let distance = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if (distance < particleMouse.radius) {
+                        ctx.beginPath();
+                        const isDark = document.body.classList.contains('dark-mode'); 
+                        // Color dinámico según tema
+                        let color = isDark ? '255,255,255' : '212,175,55';
+                        ctx.strokeStyle = `rgba(${color}, ${1 - distance/particleMouse.radius})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(this.x, this.y);
+                        ctx.lineTo(particleMouse.x, particleMouse.y);
+                        ctx.stroke();
+                    }
                 }
             }
             draw() { 
                 const isDark = document.body.classList.contains('dark-mode'); 
                 ctx.fillStyle = isDark ? '#ffffff' : '#d4af37'; 
-                ctx.globalAlpha = 0.5; 
+                ctx.globalAlpha = 0.6; 
                 ctx.beginPath(); 
                 
-                // EFECTO ESTIRAMIENTO
-                let stretch = Math.abs(lenis.velocity || 0) * 0.5;
-                if(stretch < 1) {
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
-                } else {
+                // Si hay velocidad de scroll, estiramos la partícula
+                let stretch = 0;
+                if(lenis && lenis.velocity) stretch = Math.abs(lenis.velocity) * 0.5;
+                
+                if(stretch > 1) {
                     ctx.fillRect(this.x, this.y, this.size, this.size + stretch);
+                } else {
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
                 }
                 ctx.fill(); 
             }
         }
-        function initParticles() { particlesArray = []; for (let i = 0; i < numberOfParticles; i++) { particlesArray.push(new Particle()); } }
+
+        function initParticles() { 
+            particlesArray = []; 
+            for (let i = 0; i < numberOfParticles; i++) { 
+                particlesArray.push(new Particle()); 
+            } 
+        }
+        
         function animateParticles() { 
             ctx.clearRect(0, 0, canvas.width, canvas.height); 
             for (let i = 0; i < particlesArray.length; i++) { 
@@ -177,46 +211,71 @@ document.addEventListener('DOMContentLoaded', () => {
             } 
             requestAnimationFrame(animateParticles); 
         }
-        initParticles(); animateParticles();
+        
+        initParticles(); 
+        animateParticles();
     }
 
-    // 3. CURSOR
-    const cursorDot = document.querySelector('[data-cursor-dot]');
-    const cursorOutline = document.querySelector('[data-cursor-outline]');
-    if (cursorDot && cursorOutline) {
-        let mouseX = 0, mouseY = 0;
-        let cursorX = 0, cursorY = 0;
-        window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; cursorDot.style.left = `${mouseX}px`; cursorDot.style.top = `${mouseY}px`; });
-        window.addEventListener('mousedown', () => document.body.classList.add('clicking'));
-        window.addEventListener('mouseup', () => document.body.classList.remove('clicking'));
-        function animateCursor() { const speed = 0.15; cursorX += (mouseX - cursorX) * speed; cursorY += (mouseY - cursorY) * speed; cursorOutline.style.left = `${cursorX}px`; cursorOutline.style.top = `${cursorY}px`; requestAnimationFrame(animateCursor); }
-        animateCursor();
-        document.querySelectorAll('a, button, .card, .modal-close-btn, #search-input').forEach(el => { el.addEventListener('mouseenter', () => document.body.classList.add('hovering')); el.addEventListener('mouseleave', () => document.body.classList.remove('hovering')); });
+    /* --- 6. CURSOR PERSONALIZADO (Solo PC) --- */
+    if (window.innerWidth > 768) {
+        const cursorDot = document.querySelector('[data-cursor-dot]');
+        const cursorOutline = document.querySelector('[data-cursor-outline]');
+        if (cursorDot && cursorOutline) {
+            let mouseX = 0, mouseY = 0;
+            let cursorX = 0, cursorY = 0;
+            
+            window.addEventListener('mousemove', (e) => { 
+                mouseX = e.clientX; mouseY = e.clientY; 
+                cursorDot.style.left = `${mouseX}px`; 
+                cursorDot.style.top = `${mouseY}px`; 
+            });
+            
+            window.addEventListener('mousedown', () => document.body.classList.add('clicking'));
+            window.addEventListener('mouseup', () => document.body.classList.remove('clicking'));
+            
+            function animateCursor() { 
+                const speed = 0.15; 
+                cursorX += (mouseX - cursorX) * speed; 
+                cursorY += (mouseY - cursorY) * speed; 
+                cursorOutline.style.left = `${cursorX}px`; 
+                cursorOutline.style.top = `${cursorY}px`; 
+                requestAnimationFrame(animateCursor); 
+            }
+            animateCursor();
+            
+            // Hover states
+            document.querySelectorAll('a, button, .card, .modal-close-btn, #search-input').forEach(el => { 
+                el.addEventListener('mouseenter', () => document.body.classList.add('hovering')); 
+                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering')); 
+            });
+        }
     }
 
-    // 4. LOGICA GENERAL
+    /* --- 7. NAVEGACIÓN Y PANTALLAS --- */
     const viewHome = document.getElementById('home-view');
     const viewTimeline = document.getElementById('timeline-view');
     const btnHome = document.getElementById('btn-home');
     const btnTimeline = document.getElementById('btn-timeline');
     const btnStart = document.getElementById('btn-start');
-    const container = document.getElementById('timeline');
-    const modalOverlay = document.getElementById('modal-overlay');
-    const modalBody = document.getElementById('modal-body-content');
-    const modalCloseBtn = document.getElementById('modal-close-btn');
-    const searchInput = document.getElementById('search-input');
-    const noResultsMsg = document.getElementById('no-results');
-
+    
+    // Función para cambiar de pantalla
     function cambiarPantalla(pantalla) {
         if (!viewHome || !viewTimeline) return;
+        
         if (pantalla === 'home') {
-            viewHome.classList.remove('hidden'); viewTimeline.classList.add('hidden');
-            if(btnHome) btnHome.classList.add('active'); if(btnTimeline) btnTimeline.classList.remove('active');
+            viewHome.classList.remove('hidden'); 
+            viewTimeline.classList.add('hidden');
+            if(btnHome) btnHome.classList.add('active'); 
+            if(btnTimeline) btnTimeline.classList.remove('active');
             window.scrollTo(0,0);
         } else {
-            viewHome.classList.add('hidden'); viewTimeline.classList.remove('hidden');
-            if(btnHome) btnHome.classList.remove('active'); if(btnTimeline) btnTimeline.classList.add('active');
+            viewHome.classList.add('hidden'); 
+            viewTimeline.classList.remove('hidden');
+            if(btnHome) btnHome.classList.remove('active'); 
+            if(btnTimeline) btnTimeline.classList.add('active');
             window.scrollTo(0,0);
+            
+            // Resetear visibilidad de tarjetas para animarlas de nuevo
             const cards = document.querySelectorAll('.card');
             cards.forEach(c => c.classList.remove('visible'));
         }
@@ -226,16 +285,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if(btnTimeline) btnTimeline.addEventListener('click', (e) => { e.preventDefault(); cambiarPantalla('timeline'); });
     if(btnStart) btnStart.addEventListener('click', () => { cambiarPantalla('timeline'); });
 
-    // --- CAMBIO DE TEMA CON MEMORIA ---
-    if (btnTheme) {
-        btnTheme.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            btnTheme.textContent = isDark ? '☀️' : '🌙';
-            // Guardar preferencia
-            localStorage.setItem('cronos-theme', isDark ? 'dark' : 'light');
-        });
-    }
+    /* --- 8. MODAL (Pop-up) --- */
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalBody = document.getElementById('modal-body-content');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
 
     function abrirModal(evento) {
         if (!modalOverlay || !modalBody) return;
@@ -247,20 +300,27 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         modalOverlay.classList.add('active');
         document.body.classList.add('no-scroll');
-        lenis.stop();
+        if(lenis) lenis.stop(); // Detener scroll suave
     }
+
     function cerrarModal() {
         if (!modalOverlay) return;
         modalOverlay.classList.remove('active');
         document.body.classList.remove('no-scroll');
-        lenis.start();
+        if(lenis) lenis.start(); // Reanudar scroll
     }
+
     if(modalCloseBtn) modalCloseBtn.addEventListener('click', cerrarModal);
     if(modalOverlay) modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) cerrarModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarModal(); });
 
-    // FUNCIÓN PARA EFECTO MATRIX EN TÍTULOS DE TARJETAS
-    function scrambleTitle(element) {
+    /* --- 9. GENERADOR DE TARJETAS --- */
+    const container = document.getElementById('timeline');
+    const searchInput = document.getElementById('search-input');
+    const noResultsMsg = document.getElementById('no-results');
+
+    // Función auxiliar para efecto Matrix en títulos de tarjetas
+    function scrambleCardTitle(element) {
         if(element.dataset.scrambling === "true") return; 
         element.dataset.scrambling = "true";
         const originalText = element.innerText;
@@ -279,12 +339,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 30);
     }
 
-    // GENERAR TARJETAS (MAGNETIZADAS Y CON TITULO MATRIX)
     if (container) {
-        container.innerHTML = '';
+        container.innerHTML = ''; // Limpiar por si acaso
         eventos.forEach(evento => {
             const card = document.createElement('div');
             card.classList.add('card');
+            
+            // Atributos para búsqueda y color
             card.setAttribute('data-title', evento.title.toLowerCase());
             card.setAttribute('data-year', evento.year.toLowerCase());
             card.setAttribute('data-desc', evento.desc.toLowerCase());
@@ -297,55 +358,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${evento.image}" alt="${evento.title}">
             `;
             
-            // MAGNETIZACIÓN (Traslación 2D hacia el ratón)
-            card.addEventListener('mousemove', (e) => {
-                if (!card.classList.contains('visible')) return;
-                if (window.matchMedia("(hover: none)").matches) return;
+            // INTERACTIVIDAD TARJETA (Solo PC)
+            if (window.innerWidth > 768) {
+                // Movimiento magnético 2D
+                card.addEventListener('mousemove', (e) => {
+                    if (!card.classList.contains('visible')) return;
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    card.style.transform = `translate(${x * 0.05}px, ${y * 0.05}px)`; 
+                    
+                    // Variables para el brillo holográfico
+                    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+                });
 
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-                
-                // Mover suavemente hacia el ratón
-                card.style.transform = `translate(${x * 0.05}px, ${y * 0.05}px)`; 
-                
-                // Actualizar variables para el brillo holográfico
-                card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-                card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-            });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `translate(0px, 0px)`;
+                    document.body.classList.remove('hovering');
+                });
 
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `translate(0px, 0px)`;
-                document.body.classList.remove('hovering');
-            });
+                card.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+            }
 
-            card.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
             card.addEventListener('click', () => abrirModal(evento));
             container.appendChild(card);
         });
     }
 
+    // BUSCADOR
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             const cards = document.querySelectorAll('.card');
             let visibleCount = 0;
+            
             cards.forEach(card => {
                 const title = card.getAttribute('data-title');
                 const year = card.getAttribute('data-year');
                 const desc = card.getAttribute('data-desc');
+                
                 if (title.includes(searchTerm) || year.includes(searchTerm) || desc.includes(searchTerm)) {
                     card.style.display = 'block';
-                    if (card.getBoundingClientRect().top < window.innerHeight) setTimeout(() => card.classList.add('visible'), 50);
+                    // Re-activar animación si se vuelve visible
+                    if (card.getBoundingClientRect().top < window.innerHeight) {
+                        setTimeout(() => card.classList.add('visible'), 50);
+                    }
                     visibleCount++;
                 } else {
-                    card.style.display = 'none'; card.classList.remove('visible');
+                    card.style.display = 'none'; 
+                    card.classList.remove('visible');
                 }
             });
-            if (visibleCount === 0) noResultsMsg.classList.remove('hidden'); else noResultsMsg.classList.add('hidden');
+            
+            if (visibleCount === 0) noResultsMsg.classList.remove('hidden'); 
+            else noResultsMsg.classList.add('hidden');
         });
     }
 
+    /* --- 10. SCROLL OBSERVER Y BARRA PROGRESO --- */
     const progressBar = document.getElementById('progress-bar');
     if (progressBar) {
         window.addEventListener('scroll', () => {
@@ -356,35 +428,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Scroll Observer: COLOR AMBIENTE + SCRAMBLE DE TITULOS
-    const cards = document.querySelectorAll('.card');
-    const observer = new IntersectionObserver((entries) => {
+    // Observer para animar tarjetas al entrar en pantalla
+    const cardObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
                 
-                // Color Ambiente
+                // Cambiar color ambiente
                 if(entry.target.dataset.color) {
                     document.documentElement.style.setProperty('--active-light', entry.target.dataset.color);
                 }
 
-                // Scramble Effect (Matrix) al aparecer
+                // Efecto Matrix en título de tarjeta
                 const title = entry.target.querySelector('h2');
                 if (title && !title.classList.contains('scrambled-done')) {
-                    scrambleTitle(title);
+                    scrambleCardTitle(title);
                     title.classList.add('scrambled-done');
                 }
             }
         });
-    }, { threshold: 0.4 });
+    }, { threshold: 0.15 }); // Umbral bajo para que salten antes
     
     const observeCards = () => {
         const currentCards = document.querySelectorAll('.card');
-        currentCards.forEach(card => observer.observe(card));
+        currentCards.forEach(card => cardObserver.observe(card));
     };
     observeCards();
 
-    // LÓGICA DE LA LÍNEA DE VIDA
+    // Línea de vida dorada
     window.addEventListener('scroll', () => {
         const timeline = document.getElementById('timeline');
         const activeLine = document.getElementById('active-line');
@@ -398,24 +469,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Efecto magnético para botones
-    const magnets = document.querySelectorAll('.magnetic');
-    magnets.forEach((magnet) => {
-        magnet.addEventListener('mousemove', (e) => {
-            if (window.matchMedia("(hover: none)").matches) return;
-            const rect = magnet.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            magnet.style.transform = `translate(${x * 0.4}px, ${y * 0.4}px)`;
-            magnet.style.transition = 'none'; 
+    /* --- 11. EFECTOS ADICIONALES --- */
+    // Botones magnéticos (Solo PC)
+    if (window.innerWidth > 768) {
+        const magnets = document.querySelectorAll('.magnetic');
+        magnets.forEach((magnet) => {
+            magnet.addEventListener('mousemove', (e) => {
+                const rect = magnet.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                magnet.style.transform = `translate(${x * 0.4}px, ${y * 0.4}px)`;
+            });
+            magnet.addEventListener('mouseleave', () => {
+                magnet.style.transform = `translate(0px, 0px)`;
+            });
         });
-        magnet.addEventListener('mouseleave', () => {
-            magnet.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
-            magnet.style.transform = `translate(0px, 0px)`;
-        });
-    });
+    }
 
-    // 7. EFECTO RIPPLE (ONDA EXPANSIVA)
+    // Efecto Ripple (Onda) al hacer click
     window.addEventListener('click', (e) => {
         const ripple = document.createElement('div');
         ripple.className = 'click-ripple';
