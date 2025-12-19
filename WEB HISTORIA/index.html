@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronos - Historia Universal</title>
+    
+    <link rel="icon" href="favicon.png" type="image/png">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="loading">
+
+    <div id="preloader">
+        <div class="loader-content">
+            <img src="favicon.png" alt="Cargando..." class="loader-logo">
+            <div class="loader-line"></div>
+        </div>
+    </div>
+
+    <div class="ambient-light"></div>
+    <div class="vignette"></div>
+
+    <div id="progress-bar"></div>
+
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="cursor-dot" data-cursor-dot></div>
+    <div class="cursor-outline" data-cursor-outline></div>
+
+    <nav class="navbar">
+        <div class="nav-content">
+            <img src="logo-web.png" alt="Cronos" class="logo-img">
+            <div class="menu">
+                <a href="#" id="btn-home" class="active magnetic">Inicio</a>
+                <a href="#" id="btn-timeline" class="magnetic">Línea de Tiempo</a>
+            </div>
+        </div>
+    </nav>
+
+    <button id="btn-theme-toggle" class="theme-floating-btn magnetic" title="Cambiar tema">🌙</button>
+
+    <section id="home-view" class="home-container">
+        <div class="home-content">
+            <p class="eyebrow">Una nueva forma de aprender</p>
+            <h1 class="scramble-target">La Historia, <br><span class="gradient-text shine-effect">Reimaginada.</span></h1>
+            <p class="subtitle">Un recorrido visual por los eventos que cambiaron el mundo.</p>
+            <button id="btn-start" class="cta-button magnetic">Empezar viaje</button>
+        </div>
+    </section>
+
+    <section id="timeline-view" class="hidden">
+        <header class="hero">
+            <p class="eyebrow">Cronología</p>
+            <h1>Hitos de la Humanidad</h1>
+            <p class="subtitle">Desliza hacia abajo para revelar la historia.</p>
+            
+            <div class="search-wrapper">
+                <input type="text" id="search-input" placeholder="Buscar evento, personaje o año..." autocomplete="off">
+            </div>
+        </header>
+
+        <main class="timeline-container" id="timeline">
+            <div id="active-line"></div>
+            </main>
+        
+        <p id="no-results" class="no-results-msg hidden">No se encontraron eventos con esa búsqueda.</p>
+
+        <footer>
+            <p>Cronos © 2025 Alejandro León Hernando. Diseñado con pasión por la historia.</p>
+        </footer>
+    </section>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-content-box" data-lenis-prevent>
+            <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            <div id="modal-body-content"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
