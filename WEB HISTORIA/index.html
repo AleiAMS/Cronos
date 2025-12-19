@@ -3,8 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
     <title>Cronos - Historia Universal</title>
     
+    <meta name="description" content="Un viaje interactivo por la historia de la humanidad. Desde Roma hasta la Guerra Fría, vive los hitos que cambiaron el mundo.">
+    <meta name="author" content="Alejandro León Hernando">
+    <meta property="og:title" content="Cronos - La Historia Reimaginada">
+    <meta property="og:description" content="Descubre la historia como nunca antes. Un viaje visual e interactivo.">
+    <meta property="og:image" content="preview.jpg"> <meta property="og:type" content="website">
+
     <link rel="icon" href="favicon.png" type="image/png">
     
     <link rel="stylesheet" href="style.css">
@@ -18,15 +25,31 @@
         </div>
     </div>
 
+    <div class="cursor-dot" data-cursor-dot></div>
+    <div class="cursor-outline" data-cursor-outline></div>
+
+    <div id="newsletter-overlay" class="newsletter-overlay">
+        <div class="newsletter-box">
+            <button id="newsletter-close" class="newsletter-close">&times;</button>
+            <div class="newsletter-content">
+                <h3>⏳ Viaja en el tiempo</h3>
+                <p>Recibe actualizaciones sobre nuevos hitos históricos, curiosidades y mejoras en Cronos.</p>
+                
+                <form id="newsletter-form" action="https://formspree.io/f/mqezadpr" method="POST">
+                    <input type="email" name="email" placeholder="tu@correo.com" required>
+                    <button type="submit" class="cta-button magnetic">Suscribirme</button>
+                </form>
+                <p class="newsletter-sub">Prometemos no enviar spam. Solo historia pura.</p>
+            </div>
+        </div>
+    </div>
+
     <div class="ambient-light"></div>
     <div class="vignette"></div>
 
     <div id="progress-bar"></div>
 
     <canvas id="particles-canvas"></canvas>
-
-    <div class="cursor-dot" data-cursor-dot></div>
-    <div class="cursor-outline" data-cursor-outline></div>
 
     <nav class="navbar">
         <div class="nav-content">
@@ -67,7 +90,7 @@
         <p id="no-results" class="no-results-msg hidden">No se encontraron eventos.</p>
 
         <footer>
-            <p>Cronos © 2025 Alejandro León Hernando.</p>
+            <p>Cronos © 2025 Alejandro León Hernando. Diseñado con pasión.</p>
         </footer>
     </section>
 

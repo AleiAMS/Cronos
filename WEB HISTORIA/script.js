@@ -1,4 +1,4 @@
-/* --- 1. BASE DE DATOS DE HISTORIA --- */
+/* --- DATOS: HISTORIA UNIVERSAL --- */
 const eventos = [
     {
         year: "27 a.C. - 476 d.C.",
@@ -54,12 +54,10 @@ const eventos = [
     }
 ];
 
-// Esperar a que cargue todo el HTML
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* --- 2. GESTIÓN DEL TEMA (PERSISTENTE) --- */
+    /* --- GESTIÓN DEL TEMA (PERSISTENTE) --- */
     const btnTheme = document.getElementById('btn-theme-toggle');
-    // Recuperar tema guardado
     const savedTheme = localStorage.getItem('cronos-theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');
@@ -75,14 +73,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* --- 3. PRELOADER Y TÍTULO MATRIX --- */
+    /* --- PRELOADER --- */
     const removePreloader = () => {
         document.body.classList.add('loaded');
         document.body.classList.remove('loading');
     };
-    setTimeout(removePreloader, 1000); // 1 segundo de carga mínima
+    setTimeout(removePreloader, 1000); 
 
-    // Efecto Matrix en Título Principal
     const textElement = document.querySelector(".gradient-text");
     if(textElement) {
         const originalText = textElement.innerText;
@@ -98,8 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 30);
     }
 
-    /* --- 4. SCROLL SUAVE (LENIS) --- */
-    // Verificamos si Lenis está cargado para evitar errores
+    let docTitle = document.title;
+    window.addEventListener("blur", () => { document.title = "⏳ El tiempo corre..."; });
+    window.addEventListener("focus", () => { document.title = docTitle; });
+
+    /* --- SCROLL SUAVE (LENIS) --- */
     let lenis;
     if (typeof Lenis !== 'undefined') {
         lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smooth: true });
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(raf);
     }
 
-    /* --- 5. SISTEMA DE PARTÍCULAS COMPLETO --- */
+    /* --- SISTEMA DE PARTÍCULAS --- */
     const canvas = document.getElementById('particles-canvas');
     if (canvas) {
         const ctx = canvas.getContext('2d');
@@ -121,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const numberOfParticles = 80;
         const isMobile = window.innerWidth <= 768;
         
-        // Ratón para partículas
         let particleMouse = { x: null, y: null, radius: 150 };
         
         window.addEventListener('mousemove', (e) => {
@@ -144,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.speedY = (Math.random() * 0.5) - 0.25; 
             }
             update() { 
-                // Efecto Warp Speed al hacer scroll
                 let warpSpeed = 0;
                 if (lenis && lenis.velocity) {
                     warpSpeed = lenis.velocity * 0.5;
@@ -153,12 +151,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.x += this.speedX;
                 this.y += this.speedY + warpSpeed;
                 
-                // Reposicionar si salen de pantalla
                 if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
                 if (this.y > canvas.height) this.y = 0;
                 if (this.y < 0) this.y = canvas.height;
 
-                // Conexiones neuronales (SOLO EN PC)
                 if (!isMobile && particleMouse.x != null) {
                     let dx = particleMouse.x - this.x;
                     let dy = particleMouse.y - this.y;
@@ -167,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (distance < particleMouse.radius) {
                         ctx.beginPath();
                         const isDark = document.body.classList.contains('dark-mode'); 
-                        // Color dinámico según tema
                         let color = isDark ? '255,255,255' : '212,175,55';
                         ctx.strokeStyle = `rgba(${color}, ${1 - distance/particleMouse.radius})`;
                         ctx.lineWidth = 1;
@@ -183,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.globalAlpha = 0.6; 
                 ctx.beginPath(); 
                 
-                // Si hay velocidad de scroll, estiramos la partícula
                 let stretch = 0;
                 if(lenis && lenis.velocity) stretch = Math.abs(lenis.velocity) * 0.5;
                 
@@ -211,12 +205,11 @@ document.addEventListener('DOMContentLoaded', () => {
             } 
             requestAnimationFrame(animateParticles); 
         }
-        
         initParticles(); 
         animateParticles();
     }
 
-    /* --- 6. CURSOR PERSONALIZADO (Solo PC) --- */
+    /* --- CURSOR (Solo PC) --- */
     if (window.innerWidth > 768) {
         const cursorDot = document.querySelector('[data-cursor-dot]');
         const cursorOutline = document.querySelector('[data-cursor-outline]');
@@ -243,7 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             animateCursor();
             
-            // Hover states
             document.querySelectorAll('a, button, .card, .modal-close-btn, #search-input').forEach(el => { 
                 el.addEventListener('mouseenter', () => document.body.classList.add('hovering')); 
                 el.addEventListener('mouseleave', () => document.body.classList.remove('hovering')); 
@@ -251,14 +243,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /* --- 7. NAVEGACIÓN Y PANTALLAS --- */
+    /* --- NAVEGACIÓN --- */
     const viewHome = document.getElementById('home-view');
     const viewTimeline = document.getElementById('timeline-view');
     const btnHome = document.getElementById('btn-home');
     const btnTimeline = document.getElementById('btn-timeline');
     const btnStart = document.getElementById('btn-start');
     
-    // Función para cambiar de pantalla
     function cambiarPantalla(pantalla) {
         if (!viewHome || !viewTimeline) return;
         
@@ -274,8 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(btnHome) btnHome.classList.remove('active'); 
             if(btnTimeline) btnTimeline.classList.add('active');
             window.scrollTo(0,0);
-            
-            // Resetear visibilidad de tarjetas para animarlas de nuevo
             const cards = document.querySelectorAll('.card');
             cards.forEach(c => c.classList.remove('visible'));
         }
@@ -285,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(btnTimeline) btnTimeline.addEventListener('click', (e) => { e.preventDefault(); cambiarPantalla('timeline'); });
     if(btnStart) btnStart.addEventListener('click', () => { cambiarPantalla('timeline'); });
 
-    /* --- 8. MODAL (Pop-up) --- */
+    /* --- MODAL --- */
     const modalOverlay = document.getElementById('modal-overlay');
     const modalBody = document.getElementById('modal-body-content');
     const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -300,26 +289,25 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         modalOverlay.classList.add('active');
         document.body.classList.add('no-scroll');
-        if(lenis) lenis.stop(); // Detener scroll suave
+        if(lenis) lenis.stop();
     }
 
     function cerrarModal() {
         if (!modalOverlay) return;
         modalOverlay.classList.remove('active');
         document.body.classList.remove('no-scroll');
-        if(lenis) lenis.start(); // Reanudar scroll
+        if(lenis) lenis.start();
     }
 
     if(modalCloseBtn) modalCloseBtn.addEventListener('click', cerrarModal);
     if(modalOverlay) modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) cerrarModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarModal(); });
 
-    /* --- 9. GENERADOR DE TARJETAS --- */
+    /* --- GENERADOR TARJETAS --- */
     const container = document.getElementById('timeline');
     const searchInput = document.getElementById('search-input');
     const noResultsMsg = document.getElementById('no-results');
 
-    // Función auxiliar para efecto Matrix en títulos de tarjetas
     function scrambleCardTitle(element) {
         if(element.dataset.scrambling === "true") return; 
         element.dataset.scrambling = "true";
@@ -340,12 +328,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (container) {
-        container.innerHTML = ''; // Limpiar por si acaso
+        container.innerHTML = '';
         eventos.forEach(evento => {
             const card = document.createElement('div');
             card.classList.add('card');
             
-            // Atributos para búsqueda y color
             card.setAttribute('data-title', evento.title.toLowerCase());
             card.setAttribute('data-year', evento.year.toLowerCase());
             card.setAttribute('data-desc', evento.desc.toLowerCase());
@@ -358,27 +345,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${evento.image}" alt="${evento.title}">
             `;
             
-            // INTERACTIVIDAD TARJETA (Solo PC)
+            // Magnetización (Solo PC)
             if (window.innerWidth > 768) {
-                // Movimiento magnético 2D
                 card.addEventListener('mousemove', (e) => {
                     if (!card.classList.contains('visible')) return;
                     const rect = card.getBoundingClientRect();
                     const x = e.clientX - rect.left - rect.width / 2;
                     const y = e.clientY - rect.top - rect.height / 2;
-                    
                     card.style.transform = `translate(${x * 0.05}px, ${y * 0.05}px)`; 
-                    
-                    // Variables para el brillo holográfico
                     card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
                     card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
                 });
-
                 card.addEventListener('mouseleave', () => {
                     card.style.transform = `translate(0px, 0px)`;
                     document.body.classList.remove('hovering');
                 });
-
                 card.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
             }
 
@@ -387,7 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // BUSCADOR
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
@@ -398,26 +378,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 const title = card.getAttribute('data-title');
                 const year = card.getAttribute('data-year');
                 const desc = card.getAttribute('data-desc');
-                
                 if (title.includes(searchTerm) || year.includes(searchTerm) || desc.includes(searchTerm)) {
                     card.style.display = 'block';
-                    // Re-activar animación si se vuelve visible
                     if (card.getBoundingClientRect().top < window.innerHeight) {
                         setTimeout(() => card.classList.add('visible'), 50);
                     }
                     visibleCount++;
                 } else {
-                    card.style.display = 'none'; 
-                    card.classList.remove('visible');
+                    card.style.display = 'none'; card.classList.remove('visible');
                 }
             });
-            
             if (visibleCount === 0) noResultsMsg.classList.remove('hidden'); 
             else noResultsMsg.classList.add('hidden');
         });
     }
 
-    /* --- 10. SCROLL OBSERVER Y BARRA PROGRESO --- */
+    /* --- OBSERVERS --- */
     const progressBar = document.getElementById('progress-bar');
     if (progressBar) {
         window.addEventListener('scroll', () => {
@@ -428,18 +404,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Observer para animar tarjetas al entrar en pantalla
     const cardObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
-                
-                // Cambiar color ambiente
                 if(entry.target.dataset.color) {
                     document.documentElement.style.setProperty('--active-light', entry.target.dataset.color);
                 }
-
-                // Efecto Matrix en título de tarjeta
                 const title = entry.target.querySelector('h2');
                 if (title && !title.classList.contains('scrambled-done')) {
                     scrambleCardTitle(title);
@@ -447,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-    }, { threshold: 0.15 }); // Umbral bajo para que salten antes
+    }, { threshold: 0.15 });
     
     const observeCards = () => {
         const currentCards = document.querySelectorAll('.card');
@@ -455,7 +426,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     observeCards();
 
-    // Línea de vida dorada
     window.addEventListener('scroll', () => {
         const timeline = document.getElementById('timeline');
         const activeLine = document.getElementById('active-line');
@@ -469,8 +439,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    /* --- 11. EFECTOS ADICIONALES --- */
-    // Botones magnéticos (Solo PC)
     if (window.innerWidth > 768) {
         const magnets = document.querySelectorAll('.magnetic');
         magnets.forEach((magnet) => {
@@ -486,21 +454,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Efecto Ripple (Onda) al hacer click
     window.addEventListener('click', (e) => {
         const ripple = document.createElement('div');
         ripple.className = 'click-ripple';
         const size = 30; 
-        
         ripple.style.width = `${size}px`;
         ripple.style.height = `${size}px`;
         ripple.style.left = `${e.clientX - size/2}px`;
         ripple.style.top = `${e.clientY - size/2}px`;
-        
         document.body.appendChild(ripple);
-        
-        ripple.addEventListener('animationend', () => {
-            ripple.remove();
-        });
+        ripple.addEventListener('animationend', () => { ripple.remove(); });
     });
+
+    /* --- NEWSLETTER POPUP INTELIGENTE --- */
+    const newsOverlay = document.getElementById('newsletter-overlay');
+    const newsClose = document.getElementById('newsletter-close');
+    const newsForm = document.getElementById('newsletter-form');
+
+    const SHOW_DELAY = 5000; 
+    const REAPPEAR_DAYS = 5; 
+
+    function showNewsletter() {
+        if (!newsOverlay) return;
+        
+        const isSubscribed = localStorage.getItem('cronos-subscribed');
+        const lastClosed = localStorage.getItem('cronos-news-closed');
+        const now = new Date().getTime();
+
+        if (isSubscribed === 'true') return;
+
+        if (lastClosed) {
+            const daysPassed = (now - parseInt(lastClosed)) / (1000 * 60 * 60 * 24);
+            if (daysPassed < REAPPEAR_DAYS) return;
+        }
+
+        setTimeout(() => {
+            newsOverlay.classList.add('active');
+            if(lenis) lenis.stop(); // PAUSAR SCROLL AL ABRIR
+        }, SHOW_DELAY);
+    }
+
+    if (newsClose) {
+        newsClose.addEventListener('click', () => {
+            newsOverlay.classList.remove('active');
+            if(lenis) lenis.start(); // REANUDAR SCROLL
+            localStorage.setItem('cronos-news-closed', new Date().getTime().toString());
+        });
+    }
+
+    if (newsForm) {
+        newsForm.addEventListener('submit', (e) => {
+            localStorage.setItem('cronos-subscribed', 'true');
+            // Formspree redirige, así que no necesitamos cerrar manual
+        });
+    }
+
+    showNewsletter();
 });
